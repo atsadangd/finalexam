@@ -10,7 +10,7 @@ import (
 func UpdateCustomersHandler(c *gin.Context) {
 	id := c.Param("id")
 
-	err, row := database.GetCustomersByID(id)
+	row, err := database.GetCustomersByID(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}

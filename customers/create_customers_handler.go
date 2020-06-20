@@ -15,7 +15,7 @@ func CreateCustomersHandler(c *gin.Context) {
 		return
 	}
 
-	err, id := database.CreateCustomer(cus.Name, cus.Email, cus.Status)
+	id, err := database.CreateCustomer(cus.Name, cus.Email, cus.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

@@ -9,7 +9,7 @@ import (
 
 func GetCustomersHandler(c *gin.Context) {
 
-	err, rows := database.GetCustomers()
+	rows, err := database.GetCustomers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}
