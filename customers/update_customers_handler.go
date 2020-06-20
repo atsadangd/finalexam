@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/atsadangd/finalexam/database"
+	"github.com/atsadangd/finalexam/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +16,7 @@ func UpdateCustomersHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 	}
 
-	cus := &Customer{}
+	cus := types.Customer{}
 	err = row.Scan(&cus.ID, &cus.Name, &cus.Email, &cus.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
@@ -27,7 +28,7 @@ func UpdateCustomersHandler(c *gin.Context) {
 		return
 	}
 
-	err = database.UpdateCustomersById(id, cus.Name, cus.Email, cus.Status)
+	err = database.UpdateCustomersById(cus)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}
