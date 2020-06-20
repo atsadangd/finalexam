@@ -25,11 +25,31 @@ func createCustomersHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, cus)
 }
 
-/*
-func getTodosHandler(c *gin.Context) {
-	status := c.Query("status")
+func getCustomersByIdHandler(c *gin.Context) {
+	id := c.Param("id")
 
-	stmt, err := database.Conn().Prepare("SELECT id, title, status FROM todos")
+	stmt, err := database.Conn().Prepare("SELECT id, name, email, status FROM customers where id=$1")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	row := stmt.QueryRow(id)
+
+	cus := &Customer{}
+
+	err = row.Scan(&cus.ID, &cus.Name, &cus.Email, &cus.Status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, cus)
+}
+
+func getCustomersHandler(c *gin.Context) {
+
+	stmt, err := database.Conn().Prepare("SELECT id, name, email, status FROM customers ")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -41,38 +61,25 @@ func getTodosHandler(c *gin.Context) {
 		return
 	}
 
-	todos := []Todo{}
+	custs := []Customer{}
 	for rows.Next() {
-		t := Todo{}
+		cus := Customer{}
 
-		err := rows.Scan(&t.ID, &t.Title, &t.Status)
+		err := rows.Scan(&cus.ID, &cus.Name, &cus.Email, &cus.Status)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
 
-		todos = append(todos, t)
+		custs = append(custs, cus)
 	}
 
-	tt := []Todo{}
-
-	for _, item := range todos {
-		if status != "" {
-			if item.Status == status {
-				tt = append(tt, item)
-			}
-		} else {
-			tt = append(tt, item)
-		}
-	}
-
-	c.JSON(http.StatusOK, tt)
+	c.JSON(http.StatusOK, custs)
 }
 
-func getTodoByIdHandler(c *gin.Context) {
+func updateCustomersHandler(c *gin.Context) {
 	id := c.Param("id")
-
-	stmt, err := database.Conn().Prepare("SELECT id, title, status FROM todos where id=$1")
+	stmt, err := database.Conn().Prepare("SELECT id, name, email, status FROM customers where id=$1")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -80,64 +87,43 @@ func getTodoByIdHandler(c *gin.Context) {
 
 	row := stmt.QueryRow(id)
 
-	t := &Todo{}
+	cus := &Customer{}
 
-	err = row.Scan(&t.ID, &t.Title, &t.Status)
+	err = row.Scan(&cus.ID, &cus.Name, &cus.Email, &cus.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, t)
-}
-
-func updateTodosHandler(c *gin.Context) {
-	id := c.Param("id")
-	stmt, err := database.Conn().Prepare("SELECT id, title, status FROM todos where id=$1")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	row := stmt.QueryRow(id)
-
-	t := &Todo{}
-
-	err = row.Scan(&t.ID, &t.Title, &t.Status)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	if err := c.ShouldBindJSON(t); err != nil {
+	if err := c.ShouldBindJSON(cus); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	stmt, err = database.Conn().Prepare("UPDATE todos SET status=$2, title=$3 WHERE id=$1;")
+	stmt, err = database.Conn().Prepare("UPDATE customers SET name=$2, email=$3, status=$4 WHERE id=$1;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	if _, err := stmt.Exec(id, t.Status, t.Title); err != nil {
+	if _, err := stmt.Exec(id, cus.Name, cus.Email, cus.Status); err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, t)
+	c.JSON(http.StatusOK, cus)
 }
-*/
+
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(AuthMiddleware)
 
 	r.POST("/customers", createCustomersHandler)
-	// r.GET("/customers/:id", getCustomersByIdHandler)
-	// r.GET("/customers", getCustomersHandler)
-	// r.PUT("/customers/:id", updateCustomersHandler)
-	// r.DELETE("/customers/:id", DeleteCustomersHandler)
+	r.GET("/customers/:id", getCustomersByIdHandler)
+	r.GET("/customers", getCustomersHandler)
+	r.PUT("/customers/:id", updateCustomersHandler)
+	r.DELETE("/customers/:id", DeleteCustomersHandler)
 
 	return r
 }

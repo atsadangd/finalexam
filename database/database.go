@@ -38,8 +38,20 @@ func Conn() *sql.DB {
 }
 
 /*
-func DeleteById(id string) error {
-	stmt, err := Conn().Prepare("DELETE FROM todos WHERE id = $1")
+func CreateCustomer(name, email, status string) error {
+	row := Conn().QueryRow("INSERT INTO customers (name, email, status) values ($1, $2, $3)  RETURNING id", name, email, status)
+	cus := Customer{}
+	err := row.Scan(&cus.ID)
+	if err != nil {
+		return fmt.Errorf("can't create customers: %w", err)
+	}
+
+	return nil
+}
+*/
+
+func DeleteCustomersById(id string) error {
+	stmt, err := Conn().Prepare("DELETE FROM customers WHERE id = $1")
 	if err != nil {
 		return fmt.Errorf("can't prepare delete statement: %w", err)
 	}
@@ -50,4 +62,3 @@ func DeleteById(id string) error {
 
 	return nil
 }
-*/
