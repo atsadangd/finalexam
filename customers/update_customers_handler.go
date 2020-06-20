@@ -16,7 +16,7 @@ func UpdateCustomersHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 	}
 
-	cus := types.Customer{}
+	cus := &types.Customer{}
 	err = row.Scan(&cus.ID, &cus.Name, &cus.Email, &cus.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
