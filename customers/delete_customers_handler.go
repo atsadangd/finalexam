@@ -16,15 +16,3 @@ func DeleteCustomersHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, "customer deleted.")
 }
-
-// func deleteTodoById(id string) error {
-// 	err := database.DeleteCustomersById(id)
-// 	if err != nil {
-// 		return &errors.Error{
-// 			Code:    666,
-// 			Message: "business not allow to delete specialitem",
-// 		}
-// 	}
-
-// 	return nil
-// }

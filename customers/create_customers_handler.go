@@ -1,6 +1,5 @@
 package customers
 
-/*
 import (
 	"net/http"
 
@@ -10,21 +9,17 @@ import (
 
 func CreateCustomersHandler(c *gin.Context) {
 	cus := Customer{}
+
 	if err := c.ShouldBindJSON(&cus); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// row := database.Conn().QueryRow("INSERT INTO customers (name, email, status) values ($1, $2, $3)  RETURNING id", cus.Name, cus.Email, cus.Status)
-	// err := row.Scan(&cus.ID)
-
-	err := database.CreateCustomer(cus)
-
+	err, id := database.CreateCustomer(cus.Name, cus.Email, cus.Status)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-
+	cus.ID = id
 	c.JSON(http.StatusCreated, cus)
 }
-*/
